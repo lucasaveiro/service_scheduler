@@ -1,3 +1,28 @@
+// Auth-related constants
+export const USER_ROLES = {
+  ADMIN: 'admin',
+  BUSINESS_OWNER: 'business_owner',
+  STAFF: 'staff'
+};
+
+export const BUSINESS_TYPES = {
+  HOUSEKEEPING: 'housekeeping',
+  LANDSCAPING: 'landscaping',
+  PERSONAL_CARE: 'personal_care',
+  PROFESSIONAL_SERVICES: 'professional_services',
+  OTHER: 'other'
+};
+
+export const AUTH_ERRORS = {
+  INVALID_CREDENTIALS: 'Invalid login credentials',
+  EMAIL_IN_USE: 'Email already registered',
+  WEAK_PASSWORD: 'Password is too weak',
+  INVALID_EMAIL: 'Invalid email format',
+  NETWORK_ERROR: 'Network error. Please check your connection',
+  UNKNOWN: 'An unknown error occurred'
+};
+
+// Time and date formatting functions
 import { format, startOfWeek, endOfWeek, startOfDay, endOfDay, addDays, isSameDay, isToday, isTomorrow, isYesterday } from 'date-fns'
 
 export const formatDate = (date, formatStr = 'MMM dd, yyyy') => {

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth.jsx'
 import Header from '../shared/Header'
 import Navigation from '../shared/Navigation'
 import StatsCards from './StatsCards'
 import JobCard from './JobCard'
+import BookingCalendar from '../booking/BookingCalendar'
 import { CalendarIcon, ClockIcon, UserGroupIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline'
 import { formatDate, formatDateRelative } from '../../utils/dateUtils'
 import { db } from '../../utils/supabase'
@@ -21,6 +22,10 @@ const Dashboard = () => {
   })
   const [upcomingJobs, setUpcomingJobs] = useState([])
   const [recentActivity, setRecentActivity] = useState([])
+  const [selectedScheduleDate, setSelectedScheduleDate] = useState(null)
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+  const [clients, setClients] = useState([])
+  const [services, setServices] = useState([])
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -41,9 +46,13 @@ const Dashboard = () => {
 
         if (bookingsError) throw bookingsError
 
-        // Get clients count
-        const { data: clients, error: clientsError } = await db.getClients(user.id)
-        if (clientsError) throw clientsError
+        // Get clients
+        const { data: clientsData } = await db.getClients(user.id)
+        setClients(clientsData || [])
+
+        // Get services
+        const { data: servicesData } = await db.getServices(user.id)
+        setServices(servicesData || [])
 
         // Calculate stats
         const todayBookings = bookings?.filter(booking => {
@@ -208,6 +217,12 @@ const Dashboard = () => {
     }
   }
 
+  // Booking calendar handler
+  const handleScheduleDateSelect = (date) => {
+    setSelectedScheduleDate(date);
+    setIsBookingModalOpen(true);
+  };
+
   const tabs = [
     { id: 'overview', name: 'Overview', icon: CalendarIcon },
     { id: 'schedule', name: 'Schedule', icon: ClockIcon },
@@ -351,8 +366,71 @@ const Dashboard = () => {
             </div>
           )}
 
-          {/* Placeholder for other tabs */}
-          {activeTab !== 'overview' && (
+          {/* Schedule Tab */}
+          {activeTab === 'schedule' && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 className="text-lg font-medium text-gray-900">Schedule</h2>
+                    <p className="text-sm text-gray-500">Manage your appointments and availability</p>
+                  </div>
+                  <button
+                    onClick={() => window.location.href = '/booking'}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    View Public Booking Page
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2">
+                    <BookingCalendar
+                      availableDates={[...Array(90)].map((_, i) => {
+                        const date = new Date()
+                        date.setDate(date.getDate() + i)
+                        return date.toISOString().split('T')[0]
+                      })}
+                      selectedDate={selectedScheduleDate}
+                      selectedTime={selectedScheduleTime}
+                      onDateSelect={handleScheduleDateSelect}
+                      onTimeSelect={handleScheduleTimeSelect}
+                      bookedSlots={upcomingJobs.map(job => ({
+                        date: job.scheduledDate.split('T')[0],
+                        time: job.scheduledDate.split('T')[1].substring(0, 5)
+                      }))}
+                      className="h-full"
+                    />
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">New Booking</h3>
+                    {selectedScheduleDate && selectedScheduleTime ? (
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Selected Time</p>
+                          <p className="text-lg text-gray-900">
+                            {formatDate(selectedScheduleDate)} at {formatTime(selectedScheduleTime)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setIsBookingModalOpen(true)}
+                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        >
+                          Create Booking
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">
+                        Select a date and time to create a new booking
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Other Tabs */}
+          {activeTab !== 'overview' && activeTab !== 'schedule' && (
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 {tabs.find(tab => tab.id === activeTab)?.name}
@@ -364,6 +442,44 @@ const Dashboard = () => {
           )}
         </main>
       </div>
+
+      {/* Booking Modal */}
+      {isBookingModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">Create New Booking</h2>
+              <button
+                onClick={() => setIsBookingModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500"
+              >
+                <span className="sr-only">Close</span>
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <BookingForm
+                initialDate={selectedScheduleDate}
+                onSubmit={async (bookingData) => {
+                  try {
+                    const { error } = await db.createBooking(bookingData);
+                    if (error) throw error;
+                    setIsBookingModalOpen(false);
+                    fetchDashboardData();
+                  } catch (error) {
+                    console.error('Error creating booking:', error);
+                    alert('Failed to create booking. Please try again.');
+                  }
+                }}
+                onCancel={() => setIsBookingModalOpen(false)}
+                isModal={true}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

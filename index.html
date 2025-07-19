@@ -1,13 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <meta name="description" content="Service Scheduler - Manage your business appointments and services efficiently" />
+    <meta name="theme-color" content="#2563eb" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    
+    <title>Service Scheduler | Manage Your Business</title>
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Service Scheduler" />
+    <meta property="og:description" content="Manage your business appointments and services efficiently" />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Service Scheduler" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Service Scheduler" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Disable auto-zooming on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   </head>
-  <body>
+  <body class="bg-gray-50 antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <noscript>
+      <div class="flex h-screen w-screen items-center justify-center text-center p-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 mb-2">JavaScript Required</h1>
+          <p class="text-gray-600">
+            Please enable JavaScript to use Service Scheduler. This application requires JavaScript to
+            provide you with the best possible experience.
+          </p>
+        </div>
+      </div>
+    </noscript>
   </body>
 </html>

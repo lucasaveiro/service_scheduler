@@ -1,6 +1,16 @@
 import React from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { LayoutDashboard, Calendar, Users, Briefcase, Settings } from 'lucide-react'
 
-const Navigation = ({ activeTab, setActiveTab, tabs }) => {
+const Navigation = () => {
+  const location = useLocation()
+  
+  const navigationItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { id: 'services', label: 'Services', icon: Briefcase, path: '/services' },
+    { id: 'bookings', label: 'Bookings', icon: Calendar, path: '/bookings' },
+    { id: 'clients', label: 'Clients', icon: Users, path: '/clients' },
+  ]
   return (
     <nav className="w-64 bg-white border-r border-gray-200 min-h-screen">
       <div className="p-6">
@@ -12,32 +22,33 @@ const Navigation = ({ activeTab, setActiveTab, tabs }) => {
 
         {/* Navigation Items */}
         <div className="space-y-1">
-          {tabs.map((tab) => {
-            const Icon = tab.icon
+          {navigationItems.map((item) => {
+            const Icon = item.icon
+            const isActive = location.pathname === item.path
             return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+              <Link
+                key={item.id}
+                to={item.path}
                 className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors group ${
-                  activeTab === tab.id
+                  isActive
                     ? 'bg-blue-50 text-blue-700 border border-blue-200'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
                 <Icon 
                   className={`mr-3 h-5 w-5 ${
-                    activeTab === tab.id 
+                    isActive 
                       ? 'text-blue-600' 
                       : 'text-gray-400 group-hover:text-gray-500'
                   }`}
                 />
-                <span className="truncate">{tab.label}</span>
+                <span className="truncate">{item.label}</span>
                 
                 {/* Active indicator */}
-                {activeTab === tab.id && (
+                {isActive && (
                   <div className="ml-auto w-2 h-2 bg-blue-600 rounded-full"></div>
                 )}
-              </button>
+              </Link>
             )
           })}
         </div>

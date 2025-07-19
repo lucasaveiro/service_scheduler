@@ -1,5 +1,5 @@
 import React from 'react'
-import { useAuth } from '../../hooks/useAuth'
+import { useAuth } from '../../hooks/useAuth.jsx'
 import { 
   BellIcon, 
   Cog6ToothIcon, 
@@ -70,3 +70,5 @@ const Header = () => {
     </header>
   )
 }
+
+export default Header

@@ -18,7 +18,8 @@ const ServiceModal = ({
     location: 'client_location', // client_location, business_location, remote
     requiresDeposit: false,
     depositAmount: '',
-    notes: ''
+    notes: '',
+    business_id: null // This will be set from user context
   })
 
   const [errors, setErrors] = useState({})
@@ -96,21 +97,37 @@ const ServiceModal = ({
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     
     if (!validateForm()) {
-      return
+      return;
     }
 
-    const serviceData = {
-      ...formData,
-      price: parseFloat(formData.price),
-      duration: parseInt(formData.duration),
-      depositAmount: formData.requiresDeposit ? parseFloat(formData.depositAmount) : null,
-      id: service?.id // Include ID for updates
-    }
+    try {
+      // Format data for the database
+      const serviceData = {
+        name: formData.name,
+        description: formData.description,
+        duration: parseInt(formData.duration),
+        price: parseFloat(formData.price),
+        category: formData.category,
+        is_active: formData.isActive,
+        location: formData.location,
+        requires_deposit: formData.requiresDeposit,
+        deposit_amount: formData.requiresDeposit ? parseFloat(formData.depositAmount) : null,
+        notes: formData.notes,
+        id: service?.id // Include ID for updates
+      };
 
-    await onSave(serviceData)
+      await onSave(serviceData);
+      onClose(); // Close the modal after successful save
+    } catch (error) {
+      console.error('Error saving service:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: 'Failed to save service. Please try again.'
+      }));
+    }
   }
 
   const categories = [

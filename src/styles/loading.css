@@ -1,0 +1,27 @@
+/* Loading state styles */
+#loading {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+#loading.active {
+  opacity: 1;
+  display: flex !important;
+}
+
+/* Ensure the root takes full height */
+html, body, #root {
+  height: 100%;
+}
+
+/* Hide scrollbar during loading */
+body.loading {
+  overflow: hidden;
+}
+
+/* Better font rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}

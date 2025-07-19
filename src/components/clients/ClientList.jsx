@@ -19,8 +19,8 @@ import {
   Grid3X3,
   List
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
-import { useClients } from '../../hooks/useClients';
+import { useAuth } from '../../hooks/useAuth.jsx';
+import { useClients } from '../../hooks/useclients';
 import ClientModal from './ClientModal';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import { formatDate, formatDateRelative } from '../../utils/dateUtils';
@@ -707,7 +707,6 @@ const ClientList = () => {
               }}
                 onDelete={handleDeleteClient}
                 />
-        </div>
         </div>
     );
 };

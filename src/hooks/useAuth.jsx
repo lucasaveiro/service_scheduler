@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react'
-import { auth } from '../utils/supabase'
+import { supabase } from '../utils/supabase'
 
 const AuthContext = createContext({})
 
@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
     // Get initial session
     const getInitialSession = async () => {
       try {
-        const user = await auth.getCurrentUser()
+        const { data: { user } } = await supabase.auth.getUser()
         setUser(user)
       } catch (error) {
         console.error('Error getting initial session:', error)
@@ -50,7 +50,13 @@ export const AuthProvider = ({ children }) => {
     setError(null)
     
     try {
-      const { data, error } = await auth.signUp(email, password, userData)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData
+        }
+      })
       if (error) throw error
       return data
     } catch (error) {
@@ -66,7 +72,10 @@ export const AuthProvider = ({ children }) => {
     setError(null)
     
     try {
-      const { data, error } = await auth.signIn(email, password)
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
       if (error) throw error
       return data
     } catch (error) {
@@ -80,7 +89,7 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     setLoading(true)
     try {
-      const { error } = await auth.signOut()
+      const { error } = await supabase.auth.signOut()
       if (error) throw error
     } catch (error) {
       setError(error.message)

@@ -44,38 +44,73 @@ export const auth = {
 // Database helpers
 export const db = {
   // Services
-  getServices: async (userId) => {
-    const { data, error } = await supabase
+  getServices: async (businessId, options = {}) => {
+    let query = supabase
       .from('services')
       .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-    return { data, error }
+      .eq('business_id', businessId);
+
+    if (options.isActive !== undefined) {
+      query = query.eq('is_active', options.isActive);
+    }
+
+    if (options.category) {
+      query = query.eq('category', options.category);
+    }
+
+    if (options.orderBy) {
+      query = query.order(options.orderBy.field, { 
+        ascending: options.orderBy.ascending 
+      });
+    } else {
+      query = query.order('created_at', { ascending: false });
+    }
+
+    const { data, error } = await query;
+    return { data, error };
   },
 
   createService: async (serviceData) => {
     const { data, error } = await supabase
       .from('services')
-      .insert([serviceData])
+      .insert([{
+        ...serviceData,
+        deposit_amount: serviceData.requiresDeposit ? serviceData.depositAmount : null
+      }])
       .select()
-    return { data, error }
+      .single();
+    return { data, error };
   },
 
   updateService: async (id, updates) => {
     const { data, error } = await supabase
       .from('services')
-      .update(updates)
+      .update({
+        ...updates,
+        deposit_amount: updates.requiresDeposit ? updates.depositAmount : null,
+        updated_at: new Date().toISOString()
+      })
       .eq('id', id)
       .select()
-    return { data, error }
+      .single();
+    return { data, error };
   },
 
   deleteService: async (id) => {
     const { data, error } = await supabase
       .from('services')
       .delete()
+      .eq('id', id);
+    return { data, error };
+  },
+
+  getServiceById: async (id) => {
+    const { data, error } = await supabase
+      .from('services')
+      .select('*')
       .eq('id', id)
-    return { data, error }
+      .single();
+    return { data, error };
   },
 
   // Bookings
